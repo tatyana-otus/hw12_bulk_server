@@ -4,7 +4,7 @@ before_script:
   - sudo apt-get update -qq
   - sudo apt-get install -qq g++-7 
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60 
-  - sudo apt-get install -y -qq  libboost-test-dev
+  - sudo apt-get install -y -qq  libboost-test-dev libboost-system-dev
 script:
   - cmake -H. -BBuild
   - cmake --build Build
