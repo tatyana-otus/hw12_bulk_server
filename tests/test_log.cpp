@@ -1,9 +1,11 @@
+#include <chrono> 
+
 #include "consts_types.h"
 #include "session_storage.h"
 #include "bulk_session.h"
 #include "bulk_server.h"
 #include "functions.h"
-#include <chrono> 
+
 
 using boost::asio::ip::tcp;
 
@@ -101,7 +103,6 @@ BOOST_AUTO_TEST_CASE(log_file_alredy_exist)
         client_th.detach();
 
         BOOST_CHECK_THROW(process("9001", "1"  ), std::logic_error);
-
     }
 }
 

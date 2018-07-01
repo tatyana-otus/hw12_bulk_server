@@ -1,10 +1,7 @@
-#include <cstdlib>
 #include <iostream>
-#include <memory>
-#include <set>
 #include <map>
-#include <utility>
 #include <boost/asio.hpp>
+
 #include "command.h"
 #include "bulk_handlers.h"
 
@@ -40,11 +37,6 @@ public:
     }
 
 
-    ~session_storage()
-    {
-        static_cmd->on_cmd_end();   
-    }
-
     public:
     void add_session(std::shared_ptr<bulk_session> s) 
     {
@@ -60,26 +52,32 @@ public:
     };
 
 
-    void add_cmd(std::shared_ptr<bulk_session> s, const std::string cmd)
+    void add_cmd(std::shared_ptr<bulk_session> s, const std::string& cmd)
     {
         auto it = sessions.find(s);
         if(it != sessions.end()) {
             if( (cmd == "{") || (cmd == "}") || (it->second->is_static() != true) )
                 it->second->get_data(cmd);
             else
-                static_cmd->get_data(std::move(cmd));
+                static_cmd->get_data(cmd);
         }
     };
 
     void stop()
     {
+        static_cmd->on_cmd_end();
+
+        std::unique_lock<std::mutex> lk(q_print->cv_mx);
         data_log->quit = true;
+        q_print->cv.notify_one();
+        lk.unlock();
+
+        std::unique_lock<std::mutex> lk_file(q_file->cv_mx);
         for (auto & f : file_log) {
             f->quit = true;
         }
-
-        q_print->cv.notify_one();
         q_file->cv.notify_all();
+        lk_file.unlock();
 
         data_log->stop();
         for (auto const& f : file_log) {

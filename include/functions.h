@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <iostream>
 
 using boost::asio::ip::tcp;
@@ -41,9 +40,9 @@ void process(const char* port_arg, const char* bulk_size_arg, std::ostream& os =
 
     boost::asio::io_service io_service;
 
-    /*boost::asio::signal_set signals(io_service, SIGINT, SIGTERM);
+    boost::asio::signal_set signals(io_service, SIGINT, SIGTERM);
     signals.async_wait(
-    std::bind(&boost::asio::io_service::stop, &io_service));*/
+    std::bind(&boost::asio::io_service::stop, &io_service));
 
     tcp::endpoint endpoint(tcp::v4(), port);
 

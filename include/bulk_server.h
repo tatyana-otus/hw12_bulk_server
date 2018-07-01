@@ -1,9 +1,3 @@
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-#include <set>
-#include <map>
-#include <utility>
 #include <boost/asio.hpp>
 
 class bulk_server
@@ -28,7 +22,6 @@ public:
         catch(const std::exception &e) {
 
         }
-
     }
 
 private:
@@ -40,9 +33,6 @@ private:
               if (!ec)
             {
                 std::make_shared<bulk_session>(std::move(socket), storage)->start();
-            }
-            else{
-                std::cout << "do_accept() - error !\n";
             }
 
               do_accept();

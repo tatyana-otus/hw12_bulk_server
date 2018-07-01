@@ -1,4 +1,3 @@
-
 #include "consts_types.h"
 #include "session_storage.h"
 #include "bulk_session.h"

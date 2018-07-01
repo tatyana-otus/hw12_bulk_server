@@ -1,11 +1,5 @@
-#include <iostream>
-#include <algorithm>
-#include <ctime>
 #include <vector>
 #include <thread>
-#include <atomic>
-#include <sstream>
-
 #include "consts_types.h"
 
 
@@ -15,7 +9,7 @@ struct Command {
     N(N_), file_task(f_task_), print_task(print_task_), braces_count(0)
     {
         cur_data = std::make_shared<data_type>();
-        cur_data->reserve(N);
+        cur_data->reserve(N); // !
     }
 
     void on_cmd_end()
@@ -29,7 +23,7 @@ struct Command {
         }
     }
 
-    void get_data(const std::string line)
+    void get_data(const std::string& line)
     { 
         if(line.size() > MAX_CMD_LENGTH){
             std::string msg = "Invalid command length. Command length must be < " 
@@ -101,8 +95,8 @@ private:
         }
 
         file_task->push(std::make_tuple(cur_data, init_time, ++file_id));
-        lk_file.unlock();
         file_task->cv.notify_one();
+        lk_file.unlock();       
     }
 
 
@@ -119,8 +113,8 @@ private:
         }
 
         print_task->push( cur_data );
-        lk.unlock();
         print_task->cv.notify_one();
+        lk.unlock();    
     }
 
 

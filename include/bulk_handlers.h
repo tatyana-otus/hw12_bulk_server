@@ -77,8 +77,8 @@ private:
         }     
     }
 
-        std::string main_th_id;
-        std::shared_ptr<f_tasks_t> task;       
+    std::string main_th_id;
+    std::shared_ptr<f_tasks_t> task;       
 };
 
 

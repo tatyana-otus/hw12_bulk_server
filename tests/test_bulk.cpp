@@ -1,10 +1,8 @@
-
 #include "consts_types.h"
 #include "session_storage.h"
 #include "bulk_session.h"
 #include "bulk_server.h"
-#include "functions.h"
-#include <chrono> 
+
 
 using boost::asio::ip::tcp;
 
@@ -44,14 +42,11 @@ BOOST_AUTO_TEST_CASE(serial_threads_client)
         "bulk: 10, 1, 2\n"
         "bulk: 3, 4, 5\n"
         "bulk: 6, 7, 8\n"
-        "bulk: 9, 10, 1\n"
-        "bulk: 2, 3, 4\n"
-        "bulk: 5, 6, 7\n"
-        "bulk: 8, 9, 10\n";
+        "bulk: 9, 10\n";
     
     std::stringstream oss;
     {
-        const size_t client_th_num = 3;
+        const size_t client_th_num = 2;
         std::vector<std::thread> client_th;
         client_th.resize(client_th_num);
         auto client = [](){ std::system("seq 1 10 | nc localhost 9001"); };
@@ -62,6 +57,7 @@ BOOST_AUTO_TEST_CASE(serial_threads_client)
 
         std::thread server_th([&io_service](){ io_service.run(); });
         run_serial_th(client_th, client);
+
 
         io_service.stop();
         server_th.join();
@@ -104,7 +100,8 @@ BOOST_AUTO_TEST_CASE(async_threads_client)
     auto cnt = std::count(std::istreambuf_iterator<char>(oss), 
              std::istreambuf_iterator<char>(), '\n');
 
-    BOOST_CHECK_EQUAL( cnt, (4 * repeat * client_th_num ) / 3);
+    auto rem = (4 * repeat * client_th_num ) % 3;
+    BOOST_CHECK_EQUAL( cnt, (4 * repeat * client_th_num ) / 3 + ((rem == 0) ? 0 : 1));
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -123,7 +120,8 @@ BOOST_AUTO_TEST_CASE(serial_threads_client)
     std::stringstream oss;
 
     const size_t client_th_num = 3;
-{    std::vector<std::thread> client_th;
+{    
+    std::vector<std::thread> client_th;
     client_th.resize(client_th_num); 
 
     boost::asio::io_service io_service;
@@ -132,14 +130,13 @@ BOOST_AUTO_TEST_CASE(serial_threads_client)
 
     std::thread server_th([&io_service](){ io_service.run(); });
 
-    auto client = [](){ std::system("printf \"{\n1\n2\n3\n4\n}\n5\n6\n{\n7\n8\n\" | nc  localhost 9001"); };
+    auto client = [](){ std::system("printf \"{\n1\n2\n3\n4\n}\n5\n6\n{\n7\n8\n9\n\" | nc  localhost 9001"); };
 
     run_serial_th(client_th, client);
 
     io_service.stop();
     server_th.join();
 }
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
 
     BOOST_CHECK_EQUAL( oss.str(), data);
 }
@@ -165,7 +162,7 @@ BOOST_AUTO_TEST_CASE(async_threads_client)
 
         boost::asio::io_service io_service;
         tcp::endpoint endpoint(tcp::v4(), 9001);
-        bulk_server ser(io_service, endpoint, 3, ofs);
+        bulk_server ser(io_service, endpoint, 2, ofs);
 
         std::thread server_th([&io_service](){ io_service.run(); });
 
@@ -179,11 +176,8 @@ BOOST_AUTO_TEST_CASE(async_threads_client)
 
         io_service.stop();
         server_th.join();
-
-        //std::this_thread::sleep_for(std::chrono::seconds(1));
     }    
     
-
     std::system("sort res.txt | uniq | grep bulk > res_bulk.txt");
 
     auto file1 = std::ifstream("res_bulk.txt");
