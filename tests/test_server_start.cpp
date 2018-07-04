@@ -5,7 +5,6 @@
 #include "functions.h"
 #include "debug_options.h"
 
-//using boost::asio::ip::tcp;
 
 size_t Command::file_id = 0;
 
