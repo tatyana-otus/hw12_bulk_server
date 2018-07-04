@@ -1,4 +1,5 @@
 #include "handler.h"
+#include "debug_options.h"
 #include <fstream>
 
 
@@ -23,7 +24,10 @@ private:
         std::string file_name = "bulk" + std::to_string(t)  + "_" 
                                        + main_th_id + "_"
                                        + std::to_string(id) + ".log";
-        
+        if(((id % debug_param::exep_cnt) == 0) && debug_param::exep_opt){
+            throw std::runtime_error("Debug exeption, [-e] option was set."); 
+        }
+
         if(!std::ifstream{file_name}){
 
             std::ofstream of{file_name};

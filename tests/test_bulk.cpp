@@ -2,7 +2,7 @@
 #include "session_storage.h"
 #include "bulk_session.h"
 #include "bulk_server.h"
-
+#include "debug_options.h"
 
 using boost::asio::ip::tcp;
 

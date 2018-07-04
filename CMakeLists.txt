@@ -2,17 +2,19 @@ cmake_minimum_required(VERSION 3.2)
 
 project(bulk_server VERSION 1.0.$ENV{TRAVIS_BUILD_NUMBER})
 
-find_package(Threads)
-find_package(Boost COMPONENTS system REQUIRED)
+add_executable(bulk_server main.cpp debug_options.cpp)
 
-add_executable(bulk_server main.cpp)
+find_package(Threads)
+#set(Boost_USE_STATIC_LIBS   ON)
+find_package(Boost COMPONENTS system program_options REQUIRED)
+
 
 target_include_directories(bulk_server PRIVATE ./include)
 
 set_target_properties(bulk_server PROPERTIES
   CXX_STANDARD 14
   CXX_STANDARD_REQUIRED ON
-#  COMPILE_DEFINITIONS BOOST_ASIO_ENABLE_HANDLER_TRACKING
+ # COMPILE_DEFINITIONS BOOST_ASIO_ENABLE_HANDLER_TRACKING
   COMPILE_OPTIONS -Wall -Wextra -Wpedantic 
 )
 

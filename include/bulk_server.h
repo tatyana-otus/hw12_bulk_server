@@ -35,7 +35,8 @@ private:
                 std::make_shared<bulk_session>(std::move(socket), storage)->start();
             }
 
-              do_accept();
+            do_accept();
+            
             });
     }
 

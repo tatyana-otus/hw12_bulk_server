@@ -29,5 +29,5 @@ protected:
         }
     }
     
-    std::thread helper_thread;
+    std::thread helper_thread;  
 };

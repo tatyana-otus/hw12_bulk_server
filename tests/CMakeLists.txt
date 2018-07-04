@@ -3,10 +3,10 @@ project(test)
 find_package(Boost COMPONENTS system unit_test_framework REQUIRED)
 find_package(Threads)
 
-
-add_executable(test_server_start_cli   test_server_start.cpp)
-add_executable(test_log_cli            test_log.cpp)
-add_executable(test_bulk_cli           test_bulk.cpp)
+add_executable(test_server_start_cli   test_server_start.cpp ../debug_options.cpp)
+add_executable(test_log_cli            test_log.cpp  ../debug_options.cpp)
+add_executable(test_bulk_cli           test_bulk.cpp ../debug_options.cpp)
+add_executable(test_server_cli         test_server.cpp ../debug_options.cpp)
 
 
 target_include_directories(test_server_start_cli  PRIVATE ../include)
@@ -18,7 +18,10 @@ target_include_directories(test_log_cli PRIVATE ${Boost_INCLUDE_DIR})
 target_include_directories(test_bulk_cli PRIVATE ../include)
 target_include_directories(test_bulk_cli PRIVATE ${Boost_INCLUDE_DIR})
 
-set_target_properties(test_server_start_cli test_bulk_cli test_log_cli PROPERTIES
+target_include_directories(test_server_cli PRIVATE ../include)
+target_include_directories(test_server_cli PRIVATE ${Boost_INCLUDE_DIR})
+
+set_target_properties(test_server_start_cli test_bulk_cli test_log_cli test_server_cli PROPERTIES
   CXX_STANDARD 14
   CXX_STANDARD_REQUIRED ON
   COMPILE_OPTIONS -Wpedantic -Wall -Wextra
@@ -41,6 +44,11 @@ target_link_libraries(test_server_start_cli
    ${Boost_LIBRARIES}
  )
 
+ target_link_libraries(test_server_cli
+   ${CMAKE_THREAD_LIBS_INIT}
+   ${Boost_LIBRARIES}
+ )
+
 enable_testing()
 
 add_test(test_start          test_server_start_cli  -t test_suite_main_1)
@@ -54,3 +62,5 @@ add_test(create_log_file       test_log_cli   -t test_suite_1)
 add_test(log_file_alredy_exist test_log_cli   -t test_suite_2)
 
 add_test(test_suite_delete     test_log_cli   -t test_suite_delete)
+
+add_test(file_wr_thread_exetpion  test_server_cli   -t test_suite_main_1)
